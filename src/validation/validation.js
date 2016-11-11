@@ -42,12 +42,10 @@
        </div>
 
        <div class="form-group">
-         <label class="col-sm-2 control-label" for="message">Validation disabled:</label>
-         <div class="col-sm-10">
-           <input class="form-control" type="checkbox" ng-model="isValidationDisabled"/>
-         </div>
-       </div>
-     </form>
+         <label class="col-sm-offset-1 col-sm-2 control-label checkbox-inline">
+           <input type="checkbox" ng-model="isValidationDisabled">Validation disabled</input>
+         </label>
+       </form>
      </div>
    </file>
 
