@@ -9,6 +9,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'lib/jquery/dist/jquery.js',
+      'lib/datatables/media/js/jquery.dataTables.min.js',
       'lib/bootstrap-datepicker/dist/js/bootstrap-datepicker.js',
       'lib/bootstrap-select/js/bootstrap-select.js',
       'lib/d3/d3.js',
@@ -20,6 +21,7 @@ module.exports = function(config) {
       'lib/angular-bootstrap/ui-bootstrap.js',
       'lib/angular-bootstrap/ui-bootstrap-tpls.js',
       'misc/angular-bootstrap-prettify.js',
+      'lib/angular-datatables/dist/angular-datatables.min.js',
       'lib/lodash/lodash.js',
       'misc/test-lib/helpers.js',
       'src/**/*.module.js',

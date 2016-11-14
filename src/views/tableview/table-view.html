@@ -1,0 +1,13 @@
+<table datatable="ng" dt-options="dtOptions" class="row-border hover">
+  <thead>
+  <tr>
+    <th ng-repeat="colHeader in colHeaders">{{colHeader.title}}</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="item in items">
+      <td  ng-repeat="propValue in item">{{ propValue }}</td>
+    </tr>
+  </tbody>
+</table>
+

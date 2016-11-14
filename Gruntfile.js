@@ -82,7 +82,13 @@ module.exports = function (grunt) {
           src: ['**'],
           dest: 'dist/docs',
           expand: true
-        }
+        },
+        tableImgs: {
+          cwd: 'lib/datatables/media/images',
+          src: 'sort_*',
+          dest: 'docs/images',
+          expand: true
+        },
       },
       cssmin: {
         target: {
@@ -125,6 +131,7 @@ module.exports = function (grunt) {
           dest: 'docs',
           image: 'misc/logo-alt.svg',
           scripts: ['lib/jquery/dist/jquery.js',
+            'lib/datatables/media/js/jquery.dataTables.min.js',
             'lib/bootstrap/dist/js/bootstrap.js',
             'lib/bootstrap-combobox/js/bootstrap-combobox.js',
             'lib/bootstrap-datepicker/dist/js/bootstrap-datepicker.js',
@@ -137,13 +144,19 @@ module.exports = function (grunt) {
             'lib/angular-sanitize/angular-sanitize.js',
             'lib/angular-animate/angular-animate.js',
             'lib/angular-bootstrap/ui-bootstrap-tpls.js',
+            'lib/angular-datatables/dist/angular-datatables.min.js',
             'misc/angular-bootstrap-prettify.js',
             'lib/lodash/lodash.min.js',
             'dist/angular-patternfly.js'],
           html5Mode: false,
           template: 'grunt-ngdocs-index.tmpl',
-          styles: ['lib/patternfly/dist/css/patternfly.css', 'lib/patternfly/dist/css/patternfly-additions.css',
-            'dist/styles/angular-patternfly.css', 'misc/ng-docs.css', 'misc/examples.css']
+          styles: ['lib/datatables/media/css/jquery.dataTables.min.css',
+            'lib/patternfly/dist/css/patternfly.css',
+            'lib/patternfly/dist/css/patternfly-additions.css',
+            'lib/angular-datatables/dist/css/angular-datatables.css',
+            'dist/styles/angular-patternfly.css',
+            'misc/ng-docs.css',
+            'misc/examples.css']
         },
 
         all: ['src/**/*.js']
@@ -193,7 +206,8 @@ module.exports = function (grunt) {
         },
         'patternfly.jquery': {
           cwd: 'src/',
-          src: ['form/datepicker/*.html'],
+          src: ['form/datepicker/*.html',
+                'views/tableview/*.html'],
           dest: 'templates/jquery.js'
         },
         'patternfly.filters': {
@@ -271,7 +285,7 @@ module.exports = function (grunt) {
       }
     });
 
-    grunt.registerTask('copymain', ['copy:docdata', 'copy:fa', 'copy:styles', 'copy:img']);
+    grunt.registerTask('copymain', ['copy:docdata', 'copy:fa', 'copy:styles', 'copy:img', 'copy:tableImgs']);
 
     // You can specify which modules to build as arguments of the build task.
     grunt.registerTask('build', 'Create bootstrap build files', function () {

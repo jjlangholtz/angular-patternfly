@@ -4,5 +4,4 @@
  * @description
  *   Base module for patternfly.
  */
-angular.module('patternfly.jquery', []);
-
+angular.module('patternfly.jquery', ['datatables']);
