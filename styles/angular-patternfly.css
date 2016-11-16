@@ -464,3 +464,8 @@ accordion > .panel-group .panel-open .panel-title > a:before {
 .pf-expand-placeholder {
   margin-right: 10px;
 }
+
+.pf-table-view-selected-label {
+  float: right;
+  line-height: 40px;
+}

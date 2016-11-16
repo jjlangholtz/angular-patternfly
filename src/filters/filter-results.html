@@ -12,6 +12,9 @@
         </li>
       </ul>
       <p><a class="clear-filters" ng-click="clearAllFilters()" ng-if="config.appliedFilters.length > 0">Clear All Filters</a></p>
+      <div ng-if="config.totalCount !== 0" class="pf-table-view-selected-label">
+        <strong>{{config.selectedCount}}</strong> of <strong>{{config.totalCount}}</strong> selected
+      </div>
     </div><!-- /col -->
   </div><!-- /row -->
 </div>

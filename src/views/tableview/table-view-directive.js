@@ -93,6 +93,7 @@ angular.module('patternfly.jquery').directive('pfTableView', function (DTOptions
   return {
     restrict: 'A',
     scope: {
+      config: '=?',
       dtOptions: '=?',
       items: '=',
       colHeaders: '='
@@ -145,12 +146,18 @@ angular.module('patternfly.jquery').directive('pfTableView', function (DTOptions
           item.selected = vm.selectAll;
         });
         $timeout(function () {
+          if (vm.config && vm.config.onCheckBoxChange) {
+            vm.config.onCheckBoxChange();
+          }
           selectRowsByChecked();
         });
       };
 
-      vm.toggleOne = function () {
+      vm.toggleOne = function (item) {
         $timeout(function () {
+          if (vm.config && vm.config.onCheckBoxChange) {
+            vm.config.onCheckBoxChange(item);
+          }
           setSelectAllCheckbox();
         });
       };

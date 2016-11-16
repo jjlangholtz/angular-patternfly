@@ -110,7 +110,7 @@
         </div>
       </div>
       <div class="col-md-12" ng-if="viewType == 'cardView'">
-        <div pf-card-view config="vm.listConfig" items="items">
+        <div pf-card-view config="listConfig" items="items">
           <div class="col-md-12">
             <span>{{item.name}}</span>
           </div>
@@ -123,7 +123,7 @@
         </div>
       </div>
       <div class="col-md-12" ng-if="viewType == 'tableView'">
-        <div pf-table-view col-headers="colHeaders" items="items"></div>
+        <div pf-table-view config="tableConfig" col-headers="colHeaders" items="items"></div>
       </div>
       <hr class="col-md-12">
       <div class="col-md-12">
@@ -146,8 +146,8 @@
   </file>
 
   <file name="script.js">
-  angular.module('patternfly.toolbars.demo').controller('ViewCtrl', ['$scope', 'pfViewUtils',
-    function ($scope, pfViewUtils) {
+  angular.module('patternfly.toolbars.demo').controller('ViewCtrl', ['$scope', 'pfViewUtils', '$filter',
+    function ($scope, pfViewUtils, $filter) {
       $scope.filtersText = '';
 
       $scope.colHeaders = [
@@ -232,7 +232,7 @@
       };
 
       var filterChange = function (filters) {
-      $scope.filtersText = "";
+        $scope.filtersText = "";
         filters.forEach(function (filter) {
           $scope.filtersText += filter.title + " : " + filter.value + "\n";
         });
@@ -269,6 +269,7 @@
           }
         ],
         resultsCount: $scope.items.length,
+        totalCount: $scope.allItems.length,
         appliedFilters: [],
         onFilterChange: filterChange
       };
@@ -413,7 +414,12 @@
 
       $scope.listConfig = {
         selectionMatchProp: 'name',
-        checkDisabled: false
+        checkDisabled: false,
+        onCheckBoxChange: handleCheckBoxChange
+      };
+
+      $scope.tableConfig = {
+        onCheckBoxChange: handleCheckBoxChange
       };
 
       $scope.doAdd = function () {
@@ -422,6 +428,13 @@
       $scope.optionSelected = function (option) {
         $scope.actionsText = "Option " + option + " selected\n" + $scope.actionsText;
       };
+
+      function handleCheckBoxChange (item) {
+        var selectedItems = $filter('filter')($scope.allItems, {selected: true});
+        if (selectedItems) {
+          $scope.toolbarConfig.filterConfig.selectedCount = selectedItems.length;
+        }
+      }
     }
   ]);
   </file>
