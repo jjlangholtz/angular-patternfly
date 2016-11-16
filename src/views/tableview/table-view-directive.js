@@ -88,18 +88,127 @@
   </file>
 </example>
  */
-angular.module('patternfly.jquery').directive('pfTableView', function (DTOptionsBuilder, $timeout, $log) {
+angular.module('patternfly.jquery').directive('pfTableView', function (DTOptionsBuilder, DTColumnDefBuilder, pfUtils, $timeout, $log) {
   'use strict';
   return {
     restrict: 'A',
-    transclude: true,
     scope: {
+      dtOptions: '=?',
       items: '=',
       colHeaders: '='
     },
+    controllerAs: 'vm',
+    bindToController: true,
     templateUrl: 'views/tableview/table-view.html',
-    controller: function (DTOptionsBuilder, $scope, $element) {
-      $scope.dtOptions = DTOptionsBuilder.newOptions().withDOM('t');
+    controller: function (DTOptionsBuilder, DTColumnDefBuilder, $scope, pfUtils, $log) {
+      var vm = this;
+
+      var i = 0;
+      var item, prop;
+
+      vm.selectAll = false;
+      vm.dtInstance = {};
+
+      vm.defaultDtOptions = {
+        paginationType: 'full',
+        displayLength: 3,
+        order: [[2, "asc"]],
+        dom: "tp",
+        select: {
+          selector: 'td:first-child input[type="checkbox"]',
+          style: 'multi'
+        }
+      };
+
+      vm.dtOptions = pfUtils.merge(vm.defaultDtOptions, vm.dtOptions);
+
+      // checkbox is not sortable
+      vm.dtColumnDefs = [ DTColumnDefBuilder.newColumnDef(0).notSortable() ];
+      // add column def. for each property of an item
+      item = vm.items[0];
+      for (prop in item) {
+        if (item.hasOwnProperty(prop)) {   //need this 'if' for eslint
+          vm.dtColumnDefs.push(DTColumnDefBuilder.newColumnDef(i));
+          i++;
+        }
+      }
+
+      vm.dtInstanceCallback = function (_dtInstance) {
+        var oTable, rows;
+        vm.dtInstance = _dtInstance;
+        listenForDraw();
+        selectRowsByChecked();
+      };
+
+      vm.toggleAll = function () {
+        angular.forEach(vm.items, function (item) {
+          item.selected = vm.selectAll;
+        });
+        $timeout(function () {
+          selectRowsByChecked();
+        });
+      };
+
+      vm.toggleOne = function () {
+        $timeout(function () {
+          setSelectAllCheckbox();
+        });
+      };
+
+      function listenForDraw () {
+        var oTable;
+        var dtInstance = vm.dtInstance;
+        if (dtInstance && dtInstance.dataTable) {
+          oTable = dtInstance.dataTable;
+          oTable.on('draw.dt', function () {
+            $timeout(function () {
+              selectRowsByChecked();
+            });
+          });
+        }
+      }
+
+      function selectRowsByChecked () {
+        var oTable, rows, checked;
+        oTable = vm.dtInstance.DataTable;
+
+        // deselect all
+        rows = oTable.rows();
+        rows.deselect();
+
+        // select those with checked checkboxes
+        rows = oTable.rows( function ( idx, data, node ) {
+          //         row      td     input type=checkbox
+          checked = node.children[0].children[0].checked;
+          //$log.info('testing row: ' + idx + ', checked: ' + checked);
+          return checked;
+        });
+        //$log.info('# Rows Selected: ' + rows[0].length);
+        rows.select();
+
+        setSelectAllCheckbox();
+      }
+
+      function setSelectAllCheckbox () {
+        var oTable, rows, checked, numAllRows, numCheckedRows;
+        oTable = vm.dtInstance.DataTable;
+
+        // get num of all rows
+        rows = oTable.rows();
+        numAllRows = rows[0].length;
+
+        // get rows with checked checkboxes
+        rows = oTable.rows( function ( idx, data, node ) {
+          //         row      td     input type=checkbox
+          checked = node.children[0].children[0].checked;
+          //$log.info('testing row: ' + idx + ', checked: ' + checked);
+          return checked;
+        });
+        numCheckedRows = rows[0].length;
+
+        // set selectAll checkbox
+        vm.selectAll = numAllRows === numCheckedRows ? true : false;
+      }
     },
     link: function (scope, element, attrs) {
     }

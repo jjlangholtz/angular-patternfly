@@ -1,13 +1,14 @@
-<table datatable="ng" dt-options="dtOptions" class="row-border hover">
+<table datatable="ng" dt-options="vm.dtOptions" dt-column-defs="vm.dtColumnDefs" dt-instance="vm.dtInstanceCallback" class="row-border hover">
   <thead>
   <tr>
-    <th ng-repeat="colHeader in colHeaders">{{colHeader.title}}</th>
+    <th><input type="checkbox" value="vm.selectAll" ng-model="vm.selectAll" ng-change="vm.toggleAll()"/></th>
+    <th ng-repeat="colHeader in vm.colHeaders">{{colHeader.title}}</th>
   </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="item in items">
-      <td  ng-repeat="propValue in item">{{ propValue }}</td>
+    <tr ng-repeat="item in vm.items">
+      <td><input type="checkbox" value="item.selected" ng-model="item.selected" ng-change="vm.toggleOne()"/></td>
+      <td ng-repeat="(key, value) in item" ng-if="key != 'selected'">{{ value }}</td>
     </tr>
   </tbody>
 </table>
-

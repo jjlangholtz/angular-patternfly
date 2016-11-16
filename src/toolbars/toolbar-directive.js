@@ -45,8 +45,19 @@
  *   </ul>
  *
  * @example
-<example module="patternfly.toolbars">
+<example module="patternfly.toolbars.demo">
   <file name="index.html">
+    <!-- Temp. demo styles until Dan's PF datatables css is merged -->
+    <style>
+       .dataTables_wrapper {
+         border: none;
+         margin: 0px;
+         padding: 0px;
+       }
+       .table.dataTable, table.dataTable.no-footer {
+         margin: 0px;
+       }
+    </style>
     <div ng-controller="ViewCtrl" class="row example-container">
       <div class="col-md-12">
         <div pf-toolbar id="exampleToolbar" config="toolbarConfig">
@@ -78,11 +89,7 @@
          </actions>
         </div>
       </div>
-      <hr class="col-md-12">
-      <div class="col-md-12">
-        <label class="events-label">Valid Items: </label>
-      </div>
-      <div class="col-md-12 list-view-container" ng-if="viewType == 'listView'">
+      <div class="col-md-12" ng-if="viewType == 'listView'">
         <div pf-list-view config="listConfig" items="items">
           <div class="list-view-pf-description">
             <div class="list-group-item-heading">
@@ -102,7 +109,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-12 card-view-container" ng-if="viewType == 'cardView'">
+      <div class="col-md-12" ng-if="viewType == 'cardView'">
         <div pf-card-view config="vm.listConfig" items="items">
           <div class="col-md-12">
             <span>{{item.name}}</span>
@@ -115,6 +122,10 @@
           </div>
         </div>
       </div>
+      <div class="col-md-12" ng-if="viewType == 'tableView'">
+        <div pf-table-view col-headers="colHeaders" items="items"></div>
+      </div>
+      <hr class="col-md-12">
       <div class="col-md-12">
         <label class="events-label">Current Filters: </label>
       </div>
@@ -130,10 +141,21 @@
     </div>
   </file>
 
+  <file name="modules.js">
+    angular.module('patternfly.toolbars.demo', ['patternfly.toolbars','patternfly.jquery']);
+  </file>
+
   <file name="script.js">
-  angular.module('patternfly.toolbars').controller('ViewCtrl', ['$scope', 'pfViewUtils',
+  angular.module('patternfly.toolbars.demo').controller('ViewCtrl', ['$scope', 'pfViewUtils',
     function ($scope, pfViewUtils) {
       $scope.filtersText = '';
+
+      $scope.colHeaders = [
+        { title: "Name" },
+        { title: "Age" },
+        { title: "Address" },
+        { title: "Birth Month" },
+      ];
 
       $scope.allItems = [
         {
@@ -256,10 +278,10 @@
       };
 
       $scope.viewsConfig = {
-        views: [pfViewUtils.getListView(), pfViewUtils.getCardView()],
+        views: [pfViewUtils.getListView(), pfViewUtils.getCardView(), pfViewUtils.getTableView()],
         onViewSelect: viewSelected
       };
-      $scope.viewsConfig.currentView = $scope.viewsConfig.views[0].id;
+      $scope.viewsConfig.currentView = $scope.viewsConfig.views[2].id;
       $scope.viewType = $scope.viewsConfig.currentView;
 
       var monthVals = {
