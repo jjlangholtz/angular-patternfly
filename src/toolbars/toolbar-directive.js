@@ -48,16 +48,6 @@
 <example module="patternfly.toolbars.demo">
   <file name="index.html">
     <!-- Temp. demo styles until Dan's PF datatables css is merged -->
-    <style>
-       .dataTables_wrapper {
-         border: none;
-         margin: 0px;
-         padding: 0px;
-       }
-       .table.dataTable, table.dataTable.no-footer {
-         margin: 0px;
-       }
-    </style>
     <div ng-controller="ViewCtrl" class="row example-container">
       <div class="col-md-12">
         <div pf-toolbar id="exampleToolbar" config="toolbarConfig">
@@ -122,8 +112,9 @@
           </div>
         </div>
       </div>
-      <div class="col-md-12" ng-if="viewType == 'tableView'">
-        <div pf-table-view config="tableConfig"
+      <div class="col-md-12 table-view-container" ng-if="viewType == 'tableView'">
+        <div pf-table-view
+             config="tableConfig"
              colummns="colummns"
              items="items">
         </div>

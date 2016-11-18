@@ -14,22 +14,20 @@
 <example module="patternfly.jquery">
   <file name="index.html">
     <style>
-      .dataTables_wrapper {
+      .list-view-container {
         border: none;
-        margin: 0px;
-        padding: 0px;
-      }
-     .table.dataTable, table.dataTable.no-footer {
-        margin: 0px;
+        padding: 10px;
       }
     </style>
     <div ng-controller="ViewCtrl" class="row example-container">
-      <div class="col-md-12 list-view-container">
-        <div pf-table-view class="example-list-view" id="exampleTableView"
-                          dt-options="dtOptions"
-                          colummns="colummns"
-                          items="items"
-                          action-buttons="actionButtons">
+      <div class="col-md-12 list-view-container table-view-container">
+        <div table-view-container">
+          <div pf-table-view id="exampleTableView"
+                            dt-options="dtOptions"
+                            colummns="colummns"
+                            items="items"
+                            action-buttons="actionButtons">
+          </div>
         </div>
         <div class="col-md-12">
           <label style="font-weight:normal;vertical-align:center;">Events: </label>
@@ -115,20 +113,9 @@
           $scope.eventText = item.name + " : " + action.name + "\r\n" + $scope.eventText;
         };
 
-        var startServer = function (action, item) {
-          $scope.eventText = item.name + " : " + action.name + "\r\n" + $scope.eventText;
-          item.started = true;
-        };
-
         $scope.actionButtons = [
           {
-            name: 'Start',
-            class: 'btn-primary',
-            title: 'Start the server',
-            actionFn: startServer
-          },
-          {
-            name: 'Action 1',
+            name: 'Action',
             title: 'Perform an action',
             actionFn: performAction
           }
@@ -154,13 +141,14 @@ angular.module('patternfly.jquery').directive('pfTableView', function (DTOptions
     templateUrl: 'views/tableview/table-view.html',
     controller: function (DTOptionsBuilder, DTColumnDefBuilder, $scope, pfUtils, $log, $filter) {
       var vm = this;
-      var i = 0;
+      var i = 0, actnBtns = 0;
       var item, prop;
 
       vm.selectAll = false;
       vm.dtInstance = {};
 
       vm.defaultDtOptions = {
+        order: [[1, "asc"]],
         dom: "t",
         select: {
           selector: 'td:first-child input[type="checkbox"]',
@@ -182,7 +170,9 @@ angular.module('patternfly.jquery').directive('pfTableView', function (DTOptions
       }
       // action butttons
       if (vm.actionButtons && vm.actionButtons.length > 0) {
-        vm.dtColumnDefs.push(DTColumnDefBuilder.newColumnDef(i + 1).notSortable());
+        for (actnBtns = 1; actnBtns <= vm.actionButtons.length; actnBtns++) {
+          vm.dtColumnDefs.push(DTColumnDefBuilder.newColumnDef(i + actnBtns).notSortable());
+        }
       }
 
       vm.dtInstanceCallback = function (_dtInstance) {

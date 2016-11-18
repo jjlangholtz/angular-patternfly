@@ -1,18 +1,21 @@
-<table datatable="ng" dt-options="vm.dtOptions" dt-column-defs="vm.dtColumnDefs" dt-instance="vm.dtInstanceCallback" class="row-border hover">
+<table datatable="ng" dt-options="vm.dtOptions" dt-column-defs="vm.dtColumnDefs" dt-instance="vm.dtInstanceCallback"
+       class="table table-striped table-bordered table-hover dataTable">
   <thead>
-  <tr>
-    <th><input type="checkbox" value="vm.selectAll" ng-model="vm.selectAll" ng-change="vm.toggleAll()"/></th>
+  <tr role="row">
+    <th class="table-view-pf-select"><input type="checkbox" value="vm.selectAll" ng-model="vm.selectAll" ng-change="vm.toggleAll()"/></th>
     <th ng-repeat="col in vm.colummns">{{col.colHeader}}</th>
+    <th ng-if="(vm.actionButtons && vm.actionButtons.length > 0)" colspan="{{vm.actionButtons.length}}">Actions</th>
   </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="item in vm.items">
-      <td><input type="checkbox" value="item.selected" ng-model="item.selected" ng-change="vm.toggleOne()"/></td>
+    <tr role="row" ng-repeat="item in vm.items">
+      <td class="table-view-pf-select">
+        <input type="checkbox" value="item.selected" ng-model="item.selected" ng-change="vm.toggleOne()"/>
+      </td>
       <td ng-repeat="(key, value) in item" ng-if="vm.isColItemFld(key)">{{ value }}</td>
-      <td ng-if="(vm.actionButtons && vm.actionButtons.length > 0)">
-        <div class="list-view-pf-actions">
-          <button class="btn btn-default" ng-repeat="actionButton in vm.actionButtons"
-                  title="{{actionButton.title}}"
+      <td ng-if="(vm.actionButtons && vm.actionButtons.length > 0)" class="table-view-pf-actions" ng-repeat="actionButton in vm.actionButtons">
+        <div class="table-view-pf-btn">
+          <button class="btn btn-default" title="{{actionButton.title}}"
                   ng-click="vm.handleButtonAction(actionButton, item)">
               <span ng-if="!actionButton.include">{{actionButton.name}}</span>
           </button>
