@@ -123,7 +123,10 @@
         </div>
       </div>
       <div class="col-md-12" ng-if="viewType == 'tableView'">
-        <div pf-table-view config="tableConfig" col-headers="colHeaders" items="items"></div>
+        <div pf-table-view config="tableConfig"
+             colummns="colummns"
+             items="items">
+        </div>
       </div>
       <hr class="col-md-12">
       <div class="col-md-12">
@@ -150,12 +153,12 @@
     function ($scope, pfViewUtils, $filter) {
       $scope.filtersText = '';
 
-      $scope.colHeaders = [
-        { title: "Name" },
-        { title: "Age" },
-        { title: "Address" },
-        { title: "Birth Month" },
-      ];
+      $scope.colummns = [
+          { colHeader: "Name", colItemFld: "name" },
+          { colHeader: "Age", colItemFld: "age"},
+          { colHeader: "Address", colItemFld: "address" },
+          { colHeader: "BirthMonth", colItemFld: "birthMonth"},
+        ];
 
       $scope.allItems = [
         {

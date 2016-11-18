@@ -55,7 +55,7 @@
     <div ng-controller="ViewCtrl" class="row example-container">
       <div class="col-md-12 list-view-container">
         <div pf-list-view class="example-list-view" id="exampleListView"
-                          config="config" items="items"
+                          items="items"
                           action-buttons="actionButtons"
                           enable-button-for-item-fn="enableButtonForItemFn"
                           menu-actions="menuActions"

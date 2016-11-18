@@ -2,13 +2,22 @@
   <thead>
   <tr>
     <th><input type="checkbox" value="vm.selectAll" ng-model="vm.selectAll" ng-change="vm.toggleAll()"/></th>
-    <th ng-repeat="colHeader in vm.colHeaders">{{colHeader.title}}</th>
+    <th ng-repeat="col in vm.colummns">{{col.colHeader}}</th>
   </tr>
   </thead>
   <tbody>
     <tr ng-repeat="item in vm.items">
       <td><input type="checkbox" value="item.selected" ng-model="item.selected" ng-change="vm.toggleOne()"/></td>
-      <td ng-repeat="(key, value) in item" ng-if="key != 'selected'">{{ value }}</td>
+      <td ng-repeat="(key, value) in item" ng-if="vm.isColItemFld(key)">{{ value }}</td>
+      <td ng-if="(vm.actionButtons && vm.actionButtons.length > 0)">
+        <div class="list-view-pf-actions">
+          <button class="btn btn-default" ng-repeat="actionButton in vm.actionButtons"
+                  title="{{actionButton.title}}"
+                  ng-click="vm.handleButtonAction(actionButton, item)">
+              <span ng-if="!actionButton.include">{{actionButton.name}}</span>
+          </button>
+        </div>
+      </td>
     </tr>
   </tbody>
 </table>
