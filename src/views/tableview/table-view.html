@@ -4,21 +4,45 @@
   <tr role="row">
     <th class="table-view-pf-select"><input type="checkbox" value="vm.selectAll" ng-model="vm.selectAll" ng-change="vm.toggleAll()"/></th>
     <th ng-repeat="col in vm.colummns">{{col.colHeader}}</th>
-    <th ng-if="(vm.actionButtons && vm.actionButtons.length > 0)" colspan="{{vm.actionButtons.length}}">Actions</th>
+    <th ng-if="vm.areActions()" colspan="{{vm.calcActionsColspan()}}">Actions</th>
   </tr>
   </thead>
   <tbody>
-    <tr role="row" ng-repeat="item in vm.items">
+    <tr role="row" ng-repeat="item in vm.items track by $index">
       <td class="table-view-pf-select">
-        <input type="checkbox" value="item.selected" ng-model="item.selected" ng-change="vm.toggleOne()"/>
+        <input type="checkbox" value="item.selected" ng-model="item.selected" ng-change="vm.toggleOne(item)"/>
       </td>
       <td ng-repeat="(key, value) in item" ng-if="vm.isColItemFld(key)">{{ value }}</td>
-      <td ng-if="(vm.actionButtons && vm.actionButtons.length > 0)" class="table-view-pf-actions" ng-repeat="actionButton in vm.actionButtons">
+      <td ng-if="vm.actionButtons && vm.actionButtons.length > 0" class="table-view-pf-actions" ng-repeat="actionButton in vm.actionButtons">
         <div class="table-view-pf-btn">
           <button class="btn btn-default" title="{{actionButton.title}}"
                   ng-click="vm.handleButtonAction(actionButton, item)">
               <span ng-if="!actionButton.include">{{actionButton.name}}</span>
           </button>
+        </div>
+      </td>
+      <td ng-if="vm.menuActions && vm.menuActions.length > 0" class="table-view-pf-actions">
+        <div class="{{vm.dropdownClass}} dropdown-kebab-pf"
+             id="kebab_{{$index}}"
+             ng-if="vm.menuActions && vm.menuActions.length > 0">
+          <button class="btn btn-link dropdown-toggle" type="button"
+                  id="dropdownKebabRight_{{$index}}"
+                  ng-click="vm.setupActions(item, $event)"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="true">
+            <span class="fa fa-ellipsis-v"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right {{$index}}" aria-labelledby="dropdownKebabRight_{{$index}}" >
+            <li ng-repeat="menuAction in vm.menuActions"
+                ng-if="menuAction.isVisible !== false"
+                role="{{menuAction.isSeparator === true ? 'separator' : 'menuitem'}}"
+                ng-class="{'divider': (menuAction.isSeparator === true), 'disabled': (menuAction.isDisabled === true)}">
+              <a ng-if="menuAction.isSeparator !== true" title="{{menuAction.title}}" ng-click="vm.handleMenuAction(menuAction, item)">
+                {{menuAction.name}}
+              </a>
+            </li>
+          </ul>
         </div>
       </td>
     </tr>

@@ -23,11 +23,25 @@
       <div class="col-md-12 list-view-container table-view-container">
         <div table-view-container">
           <div pf-table-view id="exampleTableView"
+                            config="config"
                             dt-options="dtOptions"
                             colummns="colummns"
                             items="items"
-                            action-buttons="actionButtons">
+                            action-buttons="actionButtons"
+                            menu-actions="menuActions">
           </div>
+        </div>
+        <div class="col-md-12">
+          <form role="form">
+            <div class="form-group">
+              <label class="checkbox-inline">
+                <input type="checkbox" ng-model="usePagination" ng-change="togglePagination()">Use Pagination</input>
+              </label>
+              <label>
+                <input ng-model="dtOptions.displayLength" ng-disabled="!usePagination" style="width: 24px; padding-left: 6px;"> # Rows Per Page</input>
+              </label>
+           </div>
+         </form>
         </div>
         <div class="col-md-12">
           <label style="font-weight:normal;vertical-align:center;">Events: </label>
@@ -44,9 +58,19 @@
       function ($scope) {
         $scope.dtOptions = {
           paginationType: 'full',
-          displayLength: 3,
           order: [[2, "asc"]],
-          dom: "tp"
+          dom: "t"
+        };
+
+        $scope.usePagination = false;
+        $scope.togglePagination = function () {
+          if($scope.usePagination) {
+            $scope.dtOptions.displayLength = 3;
+            $scope.dtOptions.dom = "tp";
+          } else {
+            $scope.dtOptions.displayLength = undefined;
+            $scope.dtOptions.dom = "t";
+          }
         };
 
         $scope.colummns = [
@@ -109,6 +133,14 @@
 
         $scope.eventText = "";
 
+        $scope.config = {
+          onCheckBoxChange: handleCheckBoxChange
+        };
+
+        function handleCheckBoxChange (item) {
+          $scope.eventText = item.name + ' checked: ' + item.selected + '\r\n' + $scope.eventText;
+        };
+
         var performAction = function (action, item) {
           $scope.eventText = item.name + " : " + action.name + "\r\n" + $scope.eventText;
         };
@@ -117,6 +149,43 @@
           {
             name: 'Action',
             title: 'Perform an action',
+            actionFn: performAction
+          }
+        ];
+
+        $scope.menuActions = [
+          {
+            name: 'Action',
+            title: 'Perform an action',
+            actionFn: performAction
+          },
+          {
+            name: 'Another Action',
+            title: 'Do something else',
+            actionFn: performAction
+          },
+          {
+            name: 'Disabled Action',
+            title: 'Unavailable action',
+            actionFn: performAction,
+            isDisabled: true
+          },
+          {
+            name: 'Something Else',
+            title: '',
+            actionFn: performAction
+          },
+          {
+            isSeparator: true
+          },
+          {
+            name: 'Grouped Action 1',
+            title: 'Do something',
+            actionFn: performAction
+          },
+          {
+            name: 'Grouped Action 2',
+            title: 'Do something similar',
             actionFn: performAction
           }
         ];
@@ -134,12 +203,13 @@ angular.module('patternfly.jquery').directive('pfTableView', function (DTOptions
       dtOptions: '=?',
       colummns: '=',
       items: '=',
-      actionButtons: '=?'
+      actionButtons: '=?',
+      menuActions: '=?'
     },
     controllerAs: 'vm',
     bindToController: true,
     templateUrl: 'views/tableview/table-view.html',
-    controller: function (DTOptionsBuilder, DTColumnDefBuilder, $scope, pfUtils, $log, $filter) {
+    controller: function (DTOptionsBuilder, DTColumnDefBuilder, $scope, $element, pfUtils, $log, $filter) {
       var vm = this;
       var i = 0, actnBtns = 0;
       var item, prop;
@@ -158,7 +228,7 @@ angular.module('patternfly.jquery').directive('pfTableView', function (DTOptions
 
       vm.dtOptions = pfUtils.merge(vm.defaultDtOptions, vm.dtOptions);
 
-      // checkbox is not sortable
+      // add checkbox col, not sortable
       vm.dtColumnDefs = [ DTColumnDefBuilder.newColumnDef(0).notSortable() ];
       // add column def. for each property of an item
       item = vm.items[0];
@@ -168,11 +238,16 @@ angular.module('patternfly.jquery').directive('pfTableView', function (DTOptions
           i++;
         }
       }
-      // action butttons
+      // add actions col.
       if (vm.actionButtons && vm.actionButtons.length > 0) {
         for (actnBtns = 1; actnBtns <= vm.actionButtons.length; actnBtns++) {
-          vm.dtColumnDefs.push(DTColumnDefBuilder.newColumnDef(i + actnBtns).notSortable());
+          i += 1;
+          vm.dtColumnDefs.push(DTColumnDefBuilder.newColumnDef(i).notSortable());
         }
+      }
+      if (vm.menuActions && vm.menuActions.length > 0) {
+        i += 1;
+        vm.dtColumnDefs.push(DTColumnDefBuilder.newColumnDef(i).notSortable());
       }
 
       vm.dtInstanceCallback = function (_dtInstance) {
@@ -182,26 +257,36 @@ angular.module('patternfly.jquery').directive('pfTableView', function (DTOptions
         selectRowsByChecked();
       };
 
+      /*
+       *   Checkbox Selections
+       */
+
       vm.toggleAll = function () {
         angular.forEach(vm.items, function (item) {
-          item.selected = vm.selectAll;
+          if (item.selected !== vm.selectAll) {
+            item.selected = vm.selectAll;
+            if (vm.config && vm.config.onCheckBoxChange) {
+              vm.config.onCheckBoxChange(item);
+            }
+          }
         });
         $timeout(function () {
-          if (vm.config && vm.config.onCheckBoxChange) {
-            vm.config.onCheckBoxChange();
-          }
           selectRowsByChecked();
         });
       };
 
       vm.toggleOne = function (item) {
+        if (vm.config && vm.config.onCheckBoxChange) {
+          vm.config.onCheckBoxChange(item);
+        }
         $timeout(function () {
-          if (vm.config && vm.config.onCheckBoxChange) {
-            vm.config.onCheckBoxChange(item);
-          }
           setSelectAllCheckbox();
         });
       };
+
+      /*
+       *   Action Buttons and Menus
+       */
 
       vm.handleButtonAction = function (action, item) {
         if (action && action.actionFn) {
@@ -219,6 +304,77 @@ angular.module('patternfly.jquery').directive('pfTableView', function (DTOptions
 
         return retVal;
       };
+
+      vm.areActions = function () {
+        return (vm.actionButtons && vm.actionButtons.length > 0) ||
+               (vm.menuActions && vm.menuActions.length > 0);
+      };
+
+      vm.calcActionsColspan = function () {
+        var colspan = 0;
+
+        if (vm.actionButtons && vm.actionButtons.length > 0) {
+          colspan += vm.actionButtons.length;
+        }
+
+        if (vm.menuActions && vm.menuActions.length > 0) {
+          colspan += 1;
+        }
+
+        return colspan;
+      };
+
+      vm.handleMenuAction = function (action, item) {
+        if (!vm.checkDisabled(item) && action && action.actionFn && (action.isDisabled !== true)) {
+          action.actionFn(action, item);
+        }
+      };
+
+      vm.setupActions = function (item, event) {
+        /* Ignore disabled items completely
+        if (vm.checkDisabled(item)) {
+          return;
+        }*/
+
+        // update the actions based on the current item
+        // $scope.updateActions(item);
+
+        $timeout(function () {
+          var parentDiv = undefined;
+          var nextElement;
+
+          nextElement = event.target;
+          while (nextElement && !parentDiv) {
+            if (nextElement.className.indexOf('dropdown-kebab-pf') !== -1) {
+              parentDiv = nextElement;
+              if (nextElement.className.indexOf('open') !== -1) {
+                setDropMenuLocation (parentDiv);
+              }
+            }
+            nextElement = nextElement.parentElement;
+          }
+        });
+      };
+
+      vm.checkDisabled = function (item) {
+        return false;
+      };
+
+      function setDropMenuLocation (parentDiv) {
+        var dropButton = parentDiv.querySelector('.dropdown-toggle');
+        var dropMenu =  parentDiv.querySelector('.dropdown-menu');
+        var parentRect = $element[0].getBoundingClientRect();
+        var buttonRect = dropButton.getBoundingClientRect();
+        var menuRect = dropMenu.getBoundingClientRect();
+        var menuTop = buttonRect.top - menuRect.height;
+        var menuBottom = buttonRect.top + buttonRect.height + menuRect.height;
+
+        if ((menuBottom <= parentRect.top + parentRect.height) || (menuTop < parentRect.top)) {
+          vm.dropdownClass = 'dropdown';
+        } else {
+          vm.dropdownClass = 'dropup';
+        }
+      }
 
       function listenForDraw () {
         var oTable;

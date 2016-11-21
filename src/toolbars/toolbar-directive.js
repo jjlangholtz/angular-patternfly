@@ -276,7 +276,7 @@
         views: [pfViewUtils.getListView(), pfViewUtils.getCardView(), pfViewUtils.getTableView()],
         onViewSelect: viewSelected
       };
-      $scope.viewsConfig.currentView = $scope.viewsConfig.views[2].id;
+      $scope.viewsConfig.currentView = $scope.viewsConfig.views[0].id;
       $scope.viewType = $scope.viewsConfig.currentView;
 
       var monthVals = {
